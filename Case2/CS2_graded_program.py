@@ -36,21 +36,21 @@ if __name__ == '__main__':
             '''
             We would calculate objective value and check feasibility here.
             '''
-            # feasibility, obj_value = check_feasibility_and_calculate_objective_value(file_path, order)
+            feasibility, obj_value = check_feasibility_and_calculate_objective_value(file_path, order)
             
         except:
             print("the algorithm has errors")
             # obj_value = np.nan
             # feasibility = False
 
-        # end_time = time.time()
-        # spend_time = end_time - start_time
+        end_time = time.time()
+        spend_time = end_time - start_time
         
-        # result_df = result_df.append({'Data name': file_name, 
-        #                               'Time': spend_time,
-        #                               'Objective value': obj_value, 
-        #                               'Feasibility': feasibility},
-        #                             ignore_index=True)
+        result_df = result_df.append({'Data name': file_name, 
+                                      'Time': spend_time,
+                                      'Objective value': obj_value, 
+                                      'Feasibility': feasibility},
+                                    ignore_index=True)
 
 # output result
-# result_df.to_csv('result.csv', index=False)
+result_df.to_csv('result.csv', index=False)
