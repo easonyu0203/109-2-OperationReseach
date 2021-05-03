@@ -317,4 +317,4 @@ def heuristic_algorithm(file_path):
     
     out = np.zeros((N+1,K+1,M+1), dtype=np.float32)
     out[1:,1:,1:] = order
-    return out
+    return out.tolist()
