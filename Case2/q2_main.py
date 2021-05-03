@@ -8,6 +8,7 @@ from gurobipy import quicksum
 import math
 
 from q2_ulti import *
+from check_valid import check_feasibility_and_calculate_objective_value
 
 work_dir = os.getcwd()
 data_path = path.join(work_dir, 'data')
@@ -200,6 +201,17 @@ for data_file in data_file_list:
 
     #optimize
     model.optimize()
+
+    #check
+    order = np.zeros((N+1,K+1,M+1), dtype=np.float32)
+    for i in range(N):
+        for j in range(K):
+            for t in range(M):
+                order[i+1,j+1,t+1] = (x[i,t,j].x)
+    is_feasible, _ = check_feasibility_and_calculate_objective_value(f'./data/{instance_name}.xlsx', order)
+    if not is_feasible:
+        print('answer wrong')
+        exit()
 
     #result
     solution_file_path = path.join(os.getcwd(), 'solution', f'sol_{instance_name}.xlsx')

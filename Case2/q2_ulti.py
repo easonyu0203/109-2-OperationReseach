@@ -24,10 +24,10 @@ def get_data(data_file):
     N, M = Demand_df.shape
     K = 3 #(express delivery, air freight, Ocean freight)
     V = VendorCost_df.shape[0]
-    ContainerCap = 30 #Case 1 data
-    ContainerCost = 2750 #Case 1 data
-    # ContainerCap = 0.5 #Case 1 data
-    # ContainerCost = 1500 #Case 1 data
+    # ContainerCap = 30 #Case 1 data
+    # ContainerCost = 2750 #Case 1 data
+    ContainerCap = 0.5 #Case 1 data
+    ContainerCost = 1500 #Case 1 data
 
     Demand_ij = Demand_df.to_numpy()
     Init_i = Init_df.to_numpy().squeeze()
