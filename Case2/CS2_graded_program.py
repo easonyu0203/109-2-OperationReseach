@@ -25,27 +25,27 @@ if __name__ == '__main__':
     for i, file_name in enumerate(all_data_list):
         print(f'evaluating {file_name}')
         start_time = time.time()        
-        # try:
-        '''
-        1. We will import your algorithm here and give you file_path (e.g.,'data/OR109-2_case02_data_s1.xlsx') as function argument.
+        try:
+            '''
+            1. We will import your algorithm here and give you file_path (e.g.,'data/OR109-2_case02_data_s1.xlsx') as function argument.
+                
+            2. You need to return the order planning in list in order.
+                    order[i][j][t] is amount of product i ordered in the beginning of month t with shipping method j.
+                    i = 1, ..., |number of product|, j = 1, 2, 3, and t = 1, ..., 26.
+                Note that the indice of list need to be in order, that is , return order[i][j][t] rather than order[t][j][i]
+            '''
+            file_path = 'data/'+file_name
+            order = heuristic_algorithm(file_path)
             
-        2. You need to return the order planning in list in order.
-                order[i][j][t] is amount of product i ordered in the beginning of month t with shipping method j.
-                i = 1, ..., |number of product|, j = 1, 2, 3, and t = 1, ..., 26.
-            Note that the indice of list need to be in order, that is , return order[i][j][t] rather than order[t][j][i]
-        '''
-        file_path = 'data/'+file_name
-        order = heuristic_algorithm(file_path)
-        
-        '''
-        We would calculate objective value and check feasibility here.
-        '''
-        feasibility, obj_value = check_feasibility_and_calculate_objective_value(file_path, order)
-            
-        # except:
-        #     print("the algorithm has errors")
-        #     obj_value = np.nan
-        #     feasibility = False
+            '''
+            We would calculate objective value and check feasibility here.
+            '''
+            feasibility, obj_value = check_feasibility_and_calculate_objective_value(file_path, order)
+                
+        except:
+            print("the algorithm has errors")
+            obj_value = np.nan
+            feasibility = False
 
         end_time = time.time()
         spend_time = end_time - start_time
@@ -69,11 +69,3 @@ if __name__ == '__main__':
 result_df.to_excel('result.xlsx', index=False)
 
 print(output_df)
-
-# output_df = pd.DataFrame(columns=['Instance', 'Time', 'Gap', 'Feasibility'])
-
-# optimal = [1292779280.02, 172151187.52, 580454537.13, 922516036.11, 1153432873.11]
-# heuristic = result_df['Objective value'].to_numpy()
-# print('Gap')
-# for i, (o, h) in enumerate(zip(optimal, heuristic), start=1):
-#     print(f's{i}: {(1-o/h)*100:.3f}%')

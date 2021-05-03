@@ -6,7 +6,6 @@ import gurobipy as gb
 from gurobipy import GRB
 from gurobipy import quicksum
 import math
-from check_valid import check_feasibility_and_calculate_objective_value
 from q2_ulti import get_data
 
 def heuristic_algorithm(file_path):
@@ -158,7 +157,7 @@ def heuristic_algorithm(file_path):
     model.addConstrs(StockLevel[i,1] - Shortage[i,1] == StockLevel[i,0] + x[i,0,0] + Transit_ij[i][1] - Demand_ij[i][1] - Shortage[i,0] * BackOrderProb_i[i] for i in range(N))
     model.addConstrs(StockLevel[i,2] - Shortage[i,2] == StockLevel[i,1] + x[i,1,0] + x[i,0,1] + Transit_ij[i][2] - Demand_ij[i][2] - Shortage[i,1] * BackOrderProb_i[i] for i in range(N))
     model.addConstrs(StockLevel[i,j] - Shortage[i,j] == StockLevel[i,j-1] + x[i,j-1,0] + x[i,j-2,1] + x[i,j-3,2] - Demand_ij[i][j] - Shortage[i,j-1] * BackOrderProb_i[i] for i in range(N) for j in range(3,M))
-    model.addConstrs(StockLevel[i,j] <= M_big * (1-Bbin[i,j]) for i in range(N) for j in range(M))
+    model.addConstrs(StockLevel[i,j] <= M_big - M_big * Bbin[i,j] for i in range(N) for j in range(M))
     model.addConstrs(Shortage[i,j] <= M_big * Bbin[i,j] for i in range(N) for j in range(M))
 
     #avoud conflict
