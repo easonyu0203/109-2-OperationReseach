@@ -20,7 +20,7 @@ if __name__ == '__main__':
     # evaluate all instances 
     result_df = pd.DataFrame(columns=['Data name', 'Time', 'Objective value', 'Feasibility'])
     output_df = pd.DataFrame(columns=['Instance', 'Time', 'Gap', 'Feasibility'])
-    optimal = [1292779280.02, 172151187.52, 580454537.13, 922516036.11, 1153432873.11]
+    optimal = [1292779280.02, 172151187.52, 580454537.13, 922516036.11, 1153432873.11, 2.3067e+09]
     print(all_data_list)
     for i, file_name in enumerate(all_data_list):
         print(f'evaluating {file_name}')
