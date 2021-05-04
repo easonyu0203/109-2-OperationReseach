@@ -58,81 +58,33 @@ def heuristic_algorithm(file_path):
     
 
     #decision variable
-    x = model.addVars(N, M, K, vtype=GRB.INTEGER,name='x')
-    ContainerCnt = model.addVars(M, vtype=GRB.INTEGER, name='ContainerCnt')
-    StockLevel = model.addVars(N, M, vtype=GRB.CONTINUOUS, name='StockLevel')
-    Shortage = model.addVars(N, M, vtype=GRB.CONTINUOUS, name='Shortage')
-    Bbin = model.addVars(N, M, vtype=GRB.BINARY, name='Bbin')    
+    x = model.addVars(N, M, K, vtype=GRB.INTEGER)
+    ContainerCnt = model.addVars(M, vtype=GRB.INTEGER)
+    StockLevel = model.addVars(N, M, vtype=GRB.CONTINUOUS)
+    Shortage = model.addVars(N, M, vtype=GRB.CONTINUOUS)
+    Bbin = model.addVars(N, M, vtype=GRB.BINARY)    
     
 
     #Expr
-    VolumeInOceanExpr_j = [
-    gb.LinExpr(
-        quicksum(x[i,j,2] * CBM_i[i] for i in range(N))
-    )    
-    for j in range(M)]
+    VolumeInOceanExpr_j = [gb.LinExpr(quicksum(x[i,j,2] * CBM_i[i] for i in range(N))) for j in range(M)]
 
-    BackOrderCntExpr_ij = [
-        [
-            gb.LinExpr( Shortage[i,j] * BackOrderProb_i[i] )
-        for j in range(M)]
-    for i in range(N)]
+    BackOrderCntExpr_ij = [[gb.LinExpr( Shortage[i,j] * BackOrderProb_i[i] ) for j in range(M)] for i in range(N)]
 
-    LostSaleCntExpr_ij = [
-        [
-            gb.LinExpr( Shortage[i,j] * (1 - BackOrderProb_i[i]) )
-        for j in range(M)]
-    for i in range(N)]
+    LostSaleCntExpr_ij = [[gb.LinExpr( Shortage[i,j] * (1 - BackOrderProb_i[i]) )for j in range(M)]for i in range(N)]
 
 
     #obj function
-    TotalPurchaseCost = gb.LinExpr(
-        quicksum(
-            quicksum(
-                quicksum(
-                    x[i,j,k] * BuyCost_i[i]
-                for i in range(N))
-            for j in range(M))
-        for k in range(K))
-    )
+    TotalPurchaseCost = gb.LinExpr(quicksum(quicksum(quicksum(x[i,j,k] * BuyCost_i[i] for i in range(N))for j in range(M))for k in range(K)))
 
-    TotalShipVarCost = gb.LinExpr(
-        quicksum(
-            quicksum(
-                quicksum(
-                    x[i,j,k] * ShipVarCost_ik[i,k]
-                for k in range(K))
-            for j in range(M))
-        for i in range(N))
-    )
+    TotalShipVarCost = gb.LinExpr(quicksum(quicksum(quicksum(x[i,j,k] * ShipVarCost_ik[i,k]for k in range(K))for j in range(M))for i in range(N)))
 
-    TotalHoldingCost = gb.LinExpr(
-        quicksum(
-            quicksum(
-                StockLevel[i,j] * HoldCost_i[i]
-            for i in range(N))
-        for j in range(M))
-    )
+    TotalHoldingCost = gb.LinExpr(quicksum(quicksum(StockLevel[i,j] * HoldCost_i[i]for i in range(N))for j in range(M)))
 
-    TotalContainerCost = gb.LinExpr(
-        quicksum(ContainerCnt[j] for j in range(M)) * ContainerCost
-    )
+    TotalContainerCost = gb.LinExpr(quicksum(ContainerCnt[j] for j in range(M)) * ContainerCost)
 
-    TotalBackOrderCost = gb.LinExpr(
-        quicksum(
-            quicksum(
-                BackOrderCntExpr_ij[i][j] * BackOrderCost_i[i]
-            for i in range(N))
-        for j in range(M))
-    )
+    TotalBackOrderCost = gb.LinExpr(quicksum(quicksum(BackOrderCntExpr_ij[i][j] * BackOrderCost_i[i]for i in range(N))for j in range(M)))
 
-    TotalLostSaleCost = gb.LinExpr(
-        quicksum(
-            quicksum(
-                LostSaleCntExpr_ij[i][j] * LostSaleCost_i[i]
-            for i in range(N))
-        for j in range(M))
-    )
+    TotalLostSaleCost = gb.LinExpr(quicksum(quicksum(LostSaleCntExpr_ij[i][j] * LostSaleCost_i[i]for i in range(N))for j in range(M)))
 
 
     #set obj function
@@ -148,9 +100,7 @@ def heuristic_algorithm(file_path):
 
     #Contrain
     #let ContainerCnt to behave correctly
-    model.addConstrs(
-        VolumeInOceanExpr_j[j] / ContainerCap <= ContainerCnt[j]
-    for j in range(M))
+    model.addConstrs(VolumeInOceanExpr_j[j] / ContainerCap <= ContainerCnt[j]for j in range(M))
 
     #let Stocklevle & Shortage behave correctly
     model.addConstrs(StockLevel[i,0] - Shortage[i,0] == Init_i[i] - Demand_ij[i][0] for i in range(N))
@@ -162,19 +112,9 @@ def heuristic_algorithm(file_path):
 
     #avoud conflict
     p1, p2 = zip(*ConflictPair_alpha)
-    _ = model.addConstrs(
-        x[i,j,k] == 0
-        for i in p1
-        for j in range(0, M, 2) #even
-        for k in range(K)
-    )
+    _ = model.addConstrs(x[i,j,k] == 0 for i in p1 for j in range(0, M, 2) for k in range(K))
 
-    _ = model.addConstrs(
-        x[i,j,k] == 0
-        for i in p2
-        for j in range(1, M, 2) #even
-        for k in range(K)
-    )
+    _ = model.addConstrs(x[i,j,k] == 0 for i in p2 for j in range(1, M, 2) for k in range(K))
 
     
     #optimize
@@ -182,7 +122,7 @@ def heuristic_algorithm(file_path):
 
 
     #order
-    order = np.zeros((N,K,M), dtype=order_dtype)
+    order = np.empty((N,K,M), dtype=order_dtype)
     for i in range(N):
         for j in range(K):
             for t in range(M):

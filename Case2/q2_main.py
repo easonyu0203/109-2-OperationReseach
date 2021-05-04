@@ -6,6 +6,7 @@ import gurobipy as gb
 from gurobipy import GRB
 from gurobipy import quicksum
 import math
+import argparse
 
 from q2_ulti import *
 from check_valid import check_feasibility_and_calculate_objective_value
@@ -15,6 +16,14 @@ data_path = path.join(work_dir, 'data')
 
 data_file_list = [path.join(data_path, f) for f in os.listdir(data_path) if '~$' not in f]
 data_file_list.sort()
+
+parser = argparse.ArgumentParser(description='instance')
+parser.add_argument('--name', type=str,default=None, help='instance name')
+parser.add_argument('--save',default=False, type=bool, help='save the solution')
+args = parser.parse_args()
+
+if args.name:
+    data_file_list = [f for f in data_file_list if args.name in f]
 
 for data_file in data_file_list:
     print()
@@ -213,47 +222,48 @@ for data_file in data_file_list:
         print('answer wrong')
         exit()
 
-    #result
-    solution_file_path = path.join(os.getcwd(), 'solution', f'sol_{instance_name}.xlsx')
-    with pd.ExcelWriter(solution_file_path, engine='xlsxwriter') as writer:
+    if args.save:
+        #result
+        solution_file_path = path.join(os.getcwd(), 'solution', f'sol_{instance_name}.xlsx')
+        with pd.ExcelWriter(solution_file_path, engine='xlsxwriter') as writer:
 
-        df = pd.DataFrame([[int(x[i,j,0].x) for j in range(M)] for i in range(N)], columns=range(M))
-        df.to_excel(writer, sheet_name='Express delivery')
-        
-        df = pd.DataFrame([[int(x[i,j,1].x) for j in range(M)] for i in range(N)], columns=range(M))
-        df.to_excel(writer, sheet_name='Air frieght')
-        
-        df = pd.DataFrame([[int(x[i,j,2].x) for j in range(M)] for i in range(N)], columns=range(M))
-        df.to_excel(writer, sheet_name='Ocean frieght')
-        
-        df = pd.DataFrame([[StockLevel[i,j].x for j in range(M)] for i in range(N)], columns=range(M))
-        df.to_excel(writer, sheet_name='StockLevel')
-        
-        df = pd.DataFrame([[Shortage[i,j].x for j in range(M)] for i in range(N)], columns=range(M))
-        df.to_excel(writer, sheet_name='Shortage')
+            df = pd.DataFrame([[int(x[i,j,0].x) for j in range(M)] for i in range(N)], columns=range(M))
+            df.to_excel(writer, sheet_name='Express delivery')
+            
+            df = pd.DataFrame([[int(x[i,j,1].x) for j in range(M)] for i in range(N)], columns=range(M))
+            df.to_excel(writer, sheet_name='Air frieght')
+            
+            df = pd.DataFrame([[int(x[i,j,2].x) for j in range(M)] for i in range(N)], columns=range(M))
+            df.to_excel(writer, sheet_name='Ocean frieght')
+            
+            df = pd.DataFrame([[StockLevel[i,j].x for j in range(M)] for i in range(N)], columns=range(M))
+            df.to_excel(writer, sheet_name='StockLevel')
+            
+            df = pd.DataFrame([[Shortage[i,j].x for j in range(M)] for i in range(N)], columns=range(M))
+            df.to_excel(writer, sheet_name='Shortage')
 
-        result_df = pd.DataFrame(columns=[
-            'TotalPurchaseCost',
-            'TotalShipFixedCost',
-            'TotalShipVarCost',
-            'TotalHoldingCost',
-            'TotalContainerCost',
-            'TotalBackOrderCost',
-            'TotalLostSaleCost',
-            'TotalVendorFixedCost',
-            'objective-value',
-        ])
+            result_df = pd.DataFrame(columns=[
+                'TotalPurchaseCost',
+                'TotalShipFixedCost',
+                'TotalShipVarCost',
+                'TotalHoldingCost',
+                'TotalContainerCost',
+                'TotalBackOrderCost',
+                'TotalLostSaleCost',
+                'TotalVendorFixedCost',
+                'objective-value',
+            ])
 
-        result_df.loc[0] = [
-            str(round(TotalPurchaseCost.getValue(), 2)),
-            str(round(TotalShipFixedCost.getValue(), 2)),
-            str(round(TotalShipVarCost.getValue(), 2)),
-            str(round(TotalHoldingCost.getValue(), 2)),
-            str(round(TotalContainerCost.getValue(), 2)),
-            str(round(TotalBackOrderCost.getValue(), 2)),
-            str(round(TotalLostSaleCost.getValue(), 2)),
-            str(round(TotalVendorFixedCost.getValue(), 2)),
-            str(round(model.ObjVal, 2)),
-        ]
+            result_df.loc[0] = [
+                str(round(TotalPurchaseCost.getValue(), 2)),
+                str(round(TotalShipFixedCost.getValue(), 2)),
+                str(round(TotalShipVarCost.getValue(), 2)),
+                str(round(TotalHoldingCost.getValue(), 2)),
+                str(round(TotalContainerCost.getValue(), 2)),
+                str(round(TotalBackOrderCost.getValue(), 2)),
+                str(round(TotalLostSaleCost.getValue(), 2)),
+                str(round(TotalVendorFixedCost.getValue(), 2)),
+                str(round(model.ObjVal, 2)),
+            ]
 
-        result_df.to_excel(writer, sheet_name='result')
+            result_df.to_excel(writer, sheet_name='result')

@@ -12,16 +12,16 @@ import math
 def get_data(data_file):
     data_file = pd.ExcelFile(data_file)
     Demand_df = pd.read_excel(data_file, sheet_name='Demand', index_col='Product')
-    Init_df = pd.read_excel(data_file, sheet_name='Initial inventory', index_col='Product')
+    Init_df = pd.read_excel(data_file, sheet_name='Initial inventory', index_col='Product')['Initial inventory']
     ShippingCost_df = pd.read_excel(data_file, sheet_name='Shipping cost', index_col='Product')[['Express delivery', 'Air freight']]
     InTransit_df = pd.read_excel(data_file, sheet_name='In-transit', index_col='Product')
-    CBM_df = pd.read_excel(data_file, sheet_name='Size', index_col='Product')
+    CBM_df = pd.read_excel(data_file, sheet_name='Size', index_col='Product')['Size']
     PriceAndCost_df = pd.read_excel(data_file, sheet_name='Price and cost', index_col='Product')
     Shortage_df = pd.read_excel(data_file, sheet_name='Shortage', index_col='Product')
-    VendorProduct_df = pd.read_excel(data_file, sheet_name='Vendor-Product', index_col='Product') - 1
-    VendorCost_df = pd.read_excel(data_file, sheet_name='Vendor cost', index_col='Vendor')
-    Bound_df = pd.read_excel(data_file, sheet_name='Bounds', index_col='Product')
-    Conflict_df = pd.read_excel(data_file, sheet_name='Conflict', index_col='Conflict') - 1
+    VendorProduct_df = (pd.read_excel(data_file, sheet_name='Vendor-Product', index_col='Product') - 1)['Vendor']
+    VendorCost_df = pd.read_excel(data_file, sheet_name='Vendor cost', index_col='Vendor')['Ordering cost']
+    Bound_df = pd.read_excel(data_file, sheet_name='Bounds', index_col='Product')['Minimum order quantity (if an order is placed)']
+    Conflict_df = (pd.read_excel(data_file, sheet_name='Conflict', index_col='Conflict') - 1)[['Product 1', 'Product 2']]
 
     N, M = Demand_df.shape
     K = 3 #(express delivery, air freight, Ocean freight)
